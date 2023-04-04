@@ -9,10 +9,12 @@ SendInput = ctypes.windll.user32.SendInput
 PUL = ctypes.POINTER(ctypes.c_ulong)
 
 
-UP = 0xC8
-DOWN = 0xD0
-LEFT = 0xCB
-RIGHT = 0xCD
+UP = 0x2C       # Z
+DOWN = 0x1F     # S
+LEFT = 0x10     # Q
+RIGHT = 0x20    # D
+ESCAPE = 0x01   # ECHAP
+ENTER = 0x1C    # ENTREE
 
 
 class KeyBdInput(ctypes.Structure):
@@ -67,6 +69,7 @@ def ReleaseKey(hexKeyCode):
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
 
-while (True):
-    PressKey(UP)
+def restart_event():
+    PressKey(ESCAPE)
     time.sleep(0.5)
+    PressKey(ENTER)
