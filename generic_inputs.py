@@ -1,5 +1,4 @@
 import ctypes
-import time
 
 # source = https://stackoverflow.com/questions/14489013/simulate-python-keypresses-for-controlling-a-game
 
@@ -8,13 +7,14 @@ SendInput = ctypes.windll.user32.SendInput
 # C struct redefinitions
 PUL = ctypes.POINTER(ctypes.c_ulong)
 
-
-UP = 0x2C       # Z
-DOWN = 0x1F     # S
-LEFT = 0x10     # Q
-RIGHT = 0x20    # D
-ESCAPE = 0x01   # ECHAP
-ENTER = 0x1C    # ENTREE
+INPUTS_DICT = {
+    "UP": 0x11,  # W (Z) - NOK
+    "DOWN": 0x1F,  # S - OK
+    "LEFT": 0x1E,  # A (Q) -OK
+    "RIGHT": 0x20,  # D - OK
+    "ESCAPE": 0x01,  # ECHAP - OK
+    "ENTER": 0x1C  # ENTREE - OK
+}
 
 
 class KeyBdInput(ctypes.Structure):
@@ -67,9 +67,3 @@ def ReleaseKey(hexKeyCode):
     ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(1), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
-
-
-def restart_event():
-    PressKey(ESCAPE)
-    time.sleep(0.5)
-    PressKey(ENTER)

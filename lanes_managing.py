@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+import utils
 from statistics import mean
 from numpy import ones, vstack
 from numpy.linalg import lstsq
@@ -121,6 +121,56 @@ def draw_lanes(img, lines, color=[0, 255, 255], thickness=3):
         l1_x1, l1_y1, l1_x2, l1_y2 = average_lane(final_lanes[lane1_id])
         l2_x1, l2_y1, l2_x2, l2_y2 = average_lane(final_lanes[lane2_id])
 
-        return [l1_x1, l1_y1, l1_x2, l1_y2], [l2_x1, l2_y1, l2_x2, l2_y2]
+        return [l1_x1, l1_y1, l1_x2, l1_y2], [l2_x1, l2_y1, l2_x2, l2_y2], lane1_id, lane2_id
     except Exception as e:
         print(str(e))
+
+
+def getLines(image):
+    """Deprecated"""
+    lines = cv2.HoughLinesP(image, 0.3, np.pi / 180, 100, np.array([]), minLineLength=70, maxLineGap=20)
+    return lines
+
+
+def displayLines(image, lines):
+    """Deprecated"""
+    if lines is not None:
+        for line in lines:
+            x1, y1, x2, y2 = line.reshape(4)  # converting to 1d array
+            cv2.line(image, (x1, y1), (x2, y2), (255, 0, 0), 10)
+    return image
+
+
+def getLineCoordinatesFromParameters(image, line_parameters):
+    """Deprecated"""
+    slope = line_parameters[0]
+    intercept = line_parameters[1]
+    y1 = image.shape[0]  # since line will always start from bottom of image
+    y2 = int(y1 * (3.4 / 5))  # some random point at 3/5
+    x1 = int((y1 - intercept) / slope)
+    x2 = int((y2 - intercept) / slope)
+    return np.array([x1, y1, x2, y2])
+
+
+def getSmoothLines(image, lines):
+    """Deprecated"""
+    left_fit = []  # will hold m,c parameters for left side lines
+    right_fit = []  # will hold m,c parameters for right side lines
+
+    for line in lines:
+        x1, y1, x2, y2 = line.reshape(4)
+        parameters = np.polyfit((x1, x2), (y1, y2), 1)
+        slope = parameters[0]
+        intercept = parameters[1]
+        if slope < 0:
+            left_fit.append((slope, intercept))
+        else:
+            right_fit.append((slope, intercept))
+
+    left_fit_average = np.average(left_fit, axis=0)
+    right_fit_average = np.average(right_fit, axis=0)
+
+    # now we have got m,c parameters for left and right line, we need to know x1,y1 x2,y2 parameters
+    left_line = getLineCoordinatesFromParameters(image, left_fit_average)
+    right_line = getLineCoordinatesFromParameters(image, right_fit_average)
+    return np.array([left_line, right_line])
