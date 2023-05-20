@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import pytesseract
 import image_processing as ip
 import utils
 
@@ -14,7 +13,7 @@ sct = mss()
 # pytesseract.pytesseract.tesseract_cmd = os.environ['TESSERACT_PATH']
 
 
-class GetGameCapture:
+class GameCapture:
     def __init__(self, vertices):
         self.vertices = vertices
         self.stream = sct.grab(utils.BOX)
@@ -24,7 +23,6 @@ class GetGameCapture:
         self.frameEDGE = cv2.Canny(self.frameGRAY, threshold1=200, threshold2=300)
         self.frameEDGE_BLUR = cv2.GaussianBlur(self.frameEDGE, (5, 5), 0)
         self.frameROI_RAW = None
-
         self.frameROI = None
         # self.frameTESSERACT = None
         self.frameLINES = None
@@ -49,15 +47,16 @@ class GetGameCapture:
 
     def get_timer(self):
         """Not used anymore"""
-        while not self.stopped:
-            frame_1 = self.frame[utils.TOP_CHR:utils.BOTTOM_CHR, utils.LEFT_CHR:utils.RIGHT_CHR].copy()
-            frame_1 = cv2.GaussianBlur(frame_1, (5, 5), 0)
-            frame_1 = cv2.cvtColor(frame_1, cv2.COLOR_RGB2GRAY)
-            # (thresh, frame_1) = cv2.threshold(frame_1, 188, 255, cv2.THRESH_BINARY)
-            self.frameTESSERACT = (255 - frame_1)
-            custom_config = r'--oem 3 --psm 11 -c tessedit_char_whitelist=0123456789'
-            if not pytesseract.image_to_string(self.frameTESSERACT, config=custom_config) == '':
-                timer = pytesseract.image_to_string(self.frameTESSERACT, config=custom_config)
+        pass
+        # while not self.stopped:
+        #     frame_1 = self.frame[utils.TOP_CHR:utils.BOTTOM_CHR, utils.LEFT_CHR:utils.RIGHT_CHR].copy()
+        #     frame_1 = cv2.GaussianBlur(frame_1, (5, 5), 0)
+        #     frame_1 = cv2.cvtColor(frame_1, cv2.COLOR_RGB2GRAY)
+        #     # (thresh, frame_1) = cv2.threshold(frame_1, 188, 255, cv2.THRESH_BINARY)
+        #     self.frameTESSERACT = (255 - frame_1)
+        #     custom_config = r'--oem 3 --psm 11 -c tessedit_char_whitelist=0123456789'
+        #     if not pytesseract.image_to_string(self.frameTESSERACT, config=custom_config) == '':
+        #         timer = pytesseract.image_to_string(self.frameTESSERACT, config=custom_config)
 
     def get_lines(self):
         while not self.stopped:
@@ -68,8 +67,8 @@ class GetGameCapture:
         self.stopped = True
 
 
-def recognition_launch():
-    video_getter = GetGameCapture(utils.VERTICES_FIRST_PERSON_SUPERCAR).start()
+def launch_capture():
+    video_getter = GameCapture(utils.VERTICES_FIRST_PERSON_SUPERCAR).start()
 
     while True:
         if video_getter.stopped or cv2.waitKey(1) == ord("w"):
@@ -84,7 +83,3 @@ def recognition_launch():
         except Exception as e:
             print('showing images error : {}'.format(e))
             pass
-
-
-if __name__ == '__main__':
-    recognition_launch()

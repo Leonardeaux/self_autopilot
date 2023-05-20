@@ -1,9 +1,20 @@
 import numpy as np
 
+# game  1024 x 768
+
 TOP = 33  # Prendre en compte la taille des bordures
 LEFT = 2560  # Taille de l'ecran principal 2560
 WIDTH = 1024  # Largeur du jeu = 1024
 HEIGHT = 768  # Hauteur du jeu = 768
+
+TOP_BIG = 0
+LEFT_BIG = 0
+WIDTH_BIG = 2560
+HEIGHT_BIG = 1440 - TOP_BIG
+
+IMG_RESIZING = (160, 120, 1)
+
+N_CLASS = 8
 
 VERTICES_FIRST_PERSON_F1 = np.array([[0, HEIGHT * 0.85],
                                      [0, HEIGHT * 0.6666],
