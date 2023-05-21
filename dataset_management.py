@@ -4,6 +4,7 @@ import datetime
 import cv2
 import time
 import pandas as pd
+import shutil
 from typing import List
 from random import shuffle
 from collections import Counter
@@ -23,10 +24,18 @@ def charge_train_dataset(file_name) -> List[np.array]:
     return training_data
 
 
-def launch_dataset_feeding(file_name) -> None:
-    training_data = charge_train_dataset(file_name)
+def save_data(file_name, data):
+    np.save(file_name, data)
 
-    np.save(f'data_archive/training_data_{datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}.npy', training_data)
+
+def launch_dataset_feeding() -> None:
+    file_name = 'training_data.npy'
+
+    shutil.copyfile(file_name, f'data_archive/training_data_{datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}.npy')
+
+    file_name_tmp = 'training_data_tmp.npy'
+
+    training_data_tmp = []
 
     for i in list(range(5))[::-1]:
         print(i + 1)
@@ -35,31 +44,39 @@ def launch_dataset_feeding(file_name) -> None:
     while True:
 
         screen = grab_screen(LEFT_BIG, TOP_BIG, WIDTH_BIG, HEIGHT_BIG)
-        last_time = time.time()
+
         screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
 
         screen = cv2.resize(screen, IMG_RESIZING[:-1])
         keys = key_check()
         inputs = keys_to_one_hot(keys)
-        training_data.append(np.array([screen, inputs], dtype=object))
+        training_data_tmp.append(np.array([screen, inputs], dtype=object))
         cv2.imshow("video", screen)
         # print("outputs = {} - keys = {}".format(output, one_hot_to_keys(output)))
         if cv2.waitKey(25) & 0xFF == ord('w'):
             cv2.destroyAllWindows()
             break
 
-        if len(training_data) % 500 == 0:
-            print("{}".format(len(training_data)))
-            np.save(file_name, training_data)
+        if len(training_data_tmp) % 500 == 0:
+            np.save(f'data_tmp/{file_name_tmp}', training_data_tmp)
+            print("{}".format(len(training_data_tmp)))
+
+    training_data = charge_train_dataset(file_name)
+    training_data_tmp = np.load(f'data_tmp/{file_name_tmp}', allow_pickle=True)
+
+    final_data = np.vstack((training_data, training_data_tmp))
+
+    print(f'training_data = {len(training_data)} - training_data_tmp = {len(training_data_tmp)} - final_data = {len(final_data)}')
+
+    np.save(file_name, final_data)
 
 
 def balance_data(file_name):
     train_data = charge_train_dataset(file_name)
 
     df = pd.DataFrame(train_data)
-    print(df.head())
+
     nb_targets = Counter(df[1].apply(str))
-    print(nb_targets)
 
     min_target = np.min(list(nb_targets.values()))
 
@@ -109,3 +126,16 @@ def balance_data(file_name):
     final_data = lefts + lefts_forwards + forwards + rights_forwards + rights + backwards_lefts + backwards + backwards_rights
     shuffle(final_data)
     return final_data, min_target
+
+
+def view_dataset(file_name: str):
+    train_data = charge_train_dataset(file_name)[-1000:]
+    i = 0
+    while True:
+        cv2.imshow("image", train_data[i][0])
+        print(train_data[i][1])
+        i += 1
+
+        if cv2.waitKey(25) & 0xFF == ord('w'):
+            cv2.destroyAllWindows()
+            break

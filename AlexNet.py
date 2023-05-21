@@ -4,7 +4,7 @@ from keras.layers import Dense, Activation, Dropout, Flatten, Conv2D, MaxPool2D,
 from keras.optimizers import SGD
 
 
-def AlexNet_model(input_shape, n_class, learning_rate, validation_split_value, exp_name) -> Sequential:
+def AlexNet_model(input_shape, n_class, learning_rate) -> Sequential:
     model = Sequential([
         Conv2D(filters=128, kernel_size=(11, 11), strides=(4, 4), activation='relu',
                input_shape=input_shape),
@@ -28,7 +28,7 @@ def AlexNet_model(input_shape, n_class, learning_rate, validation_split_value, e
         Dense(n_class, activation='softmax')
     ])
 
-    model.compile(loss='sparse_categorical_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer=SGD(learning_rate=learning_rate),
                   metrics=['accuracy'])
     model.summary()
