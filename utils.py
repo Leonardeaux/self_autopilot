@@ -1,61 +1,21 @@
-import numpy as np
+import pandas as pd
+import zipfile
 
-# game  1024 x 768
 
-TOP = 33  # Prendre en compte la taille des bordures
-LEFT = 2560  # Taille de l'ecran principal 2560
-WIDTH = 1024  # Largeur du jeu = 1024
-HEIGHT = 768  # Hauteur du jeu = 768
+def get_data_and_zip(data_file_name: str):
+    train_data = pd.read_csv(data_file_name, sep=';')
 
-TOP_2K = 0
-LEFT_2K = 0
-WIDTH_2K = 2560
-HEIGHT_2K = 1440 - TOP_2K
+    compression = zipfile.ZIP_DEFLATED
 
-TOP_ACC = 175
-LEFT_ACC = 0
-WIDTH_ACC = 2560
-HEIGHT_ACC = int((1440 - TOP_ACC) * 0.81)
-
-IMG_RESIZING = (160, 120, 1)
-
-N_CLASS = 8
-
-VERTICES_FIRST_PERSON_F1 = np.array([[0, HEIGHT * 0.85],
-                                     [0, HEIGHT * 0.6666],
-                                     [WIDTH / 3, HEIGHT * 0.4],
-                                     [WIDTH * 0.6666, HEIGHT * 0.4],
-                                     [WIDTH, HEIGHT * 0.6666],
-                                     [WIDTH, HEIGHT * 0.85]], dtype=np.int32)
-
-VERTICES_FIRST_PERSON_SUPERCAR = np.array([[0, HEIGHT * 0.82],
-                                           [0, HEIGHT * 0.5],
-                                           [WIDTH / 3, HEIGHT * 0.45],
-                                           [WIDTH * 0.6666, HEIGHT * 0.45],
-                                           [WIDTH, HEIGHT * 0.5],
-                                           [WIDTH, HEIGHT * 0.82]], dtype=np.int32)
-
-VERTICES_THIRD_PERSON = np.array([[0, HEIGHT * 0.8],
-                                  [0, HEIGHT * 0.57],
-                                  [WIDTH * 0.3333, HEIGHT * 0.45],
-                                  [WIDTH * 0.6666, HEIGHT * 0.45],
-                                  [WIDTH, HEIGHT * 0.57],
-                                  [WIDTH, HEIGHT * 0.8]], dtype=np.int32)
-vertices = np.array(
-    [[0, HEIGHT * 0.455],
-     [WIDTH / 3, HEIGHT * 0.365],
-     [WIDTH * 0.62, HEIGHT * 0.365],
-     [WIDTH - 1, HEIGHT * 0.41],
-     [WIDTH - 1, HEIGHT * 0.82],
-     [WIDTH * 0.84, HEIGHT * 0.83],
-     [WIDTH * 0.64, HEIGHT / 2],
-     [WIDTH / 3, HEIGHT / 2],
-     [WIDTH * 0.16, HEIGHT * 0.83],
-     [0, HEIGHT * 0.83]], dtype=np.int32)
-
-TOP_CHR = int(HEIGHT - (HEIGHT * 0.08))
-LEFT_CHR = int(WIDTH - (WIDTH * 0.57))
-BOTTOM_CHR = int(HEIGHT - (HEIGHT * 0.02))
-RIGHT_CHR = int(WIDTH - (WIDTH * 0.44))
-
-BOX = {'top': TOP, 'left': LEFT, 'width': WIDTH, 'height': HEIGHT}
+    zf = zipfile.ZipFile("data_archives/data_archive.zip", mode="w")
+    try:
+        zf.write(data_file_name, data_file_name, compress_type=compression)
+        for file_name in train_data['image_name']:
+            # Add file to the zip file
+            # first parameter file to zip, second filename in zip
+            zf.write("images/" + file_name, file_name, compress_type=compression)
+    except FileNotFoundError:
+        print("An error occurred")
+    finally:
+        # Don't forget to close the file!
+        zf.close()

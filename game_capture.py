@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import image_processing as ip
-import utils
+import variables
 
 from mss import mss
 from threading import Thread

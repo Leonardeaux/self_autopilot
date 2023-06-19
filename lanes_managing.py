@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import utils
+import variables
 from statistics import mean
 from numpy import ones, vstack
 from numpy.linalg import lstsq

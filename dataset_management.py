@@ -11,8 +11,9 @@ from random import shuffle
 from collections import Counter
 from grab_screen import grab_screen
 from get_inputs import keys_to_one_hot, key_check, one_hot_to_keys
-from utils import TOP_2K, LEFT_2K, WIDTH_2K, HEIGHT_2K, IMG_RESIZING, TOP_ACC, LEFT_ACC, WIDTH_ACC, HEIGHT_ACC
+from variables import TOP_2K, LEFT_2K, WIDTH_2K, HEIGHT_2K, IMG_RESIZING, TOP_ACC, LEFT_ACC, WIDTH_ACC, HEIGHT_ACC
 from acc_mmap import read_physics
+from utils import get_data_and_zip
 
 
 def charge_train_dataset(file_name) -> List[np.array]:
@@ -77,6 +78,8 @@ def launch_dataset_feeding() -> None:
 
 def launch_dataset_feeding_v2() -> None:
     file_name = 'training_data.csv'
+
+    get_data_and_zip(file_name)
 
     training_file = open(file_name, 'a')
 
