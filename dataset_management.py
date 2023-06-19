@@ -5,14 +5,14 @@ import cv2
 import time
 import pandas as pd
 import shutil
-import f1_telemetry
 from PIL import Image
 from typing import List
 from random import shuffle
 from collections import Counter
 from grab_screen import grab_screen
 from get_inputs import keys_to_one_hot, key_check, one_hot_to_keys
-from utils import TOP_2K, LEFT_2K, WIDTH_2K, HEIGHT_2K, IMG_RESIZING
+from utils import TOP_2K, LEFT_2K, WIDTH_2K, HEIGHT_2K, IMG_RESIZING, TOP_ACC, LEFT_ACC, WIDTH_ACC, HEIGHT_ACC
+from acc_mmap import read_physics
 
 
 def charge_train_dataset(file_name) -> List[np.array]:
@@ -78,12 +78,7 @@ def launch_dataset_feeding() -> None:
 def launch_dataset_feeding_v2() -> None:
     file_name = 'training_data.csv'
 
-    shutil.copyfile(file_name,
-                    f'data_archive/training_data_{datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}.csv')
-
     training_file = open(file_name, 'a')
-
-    listener = f1_telemetry.get_listener()
 
     counter = 0
     wait_c = 0
@@ -93,20 +88,8 @@ def launch_dataset_feeding_v2() -> None:
         time.sleep(1)
 
     while True:
-        samples = {}
-        packet = listener.get()
 
-        key = (
-            packet.header.packet_format,
-            packet.header.packet_version,
-            packet.header.packet_id,
-        )
-
-        packet_type = f1_telemetry.HEADER_FIELD_TO_PACKET_TYPE[key].__name__
-
-        samples[packet_type] = packet
-
-        screen = grab_screen(LEFT_2K, TOP_2K, WIDTH_2K, HEIGHT_2K)
+        screen = grab_screen(LEFT_ACC, TOP_ACC, WIDTH_ACC, HEIGHT_ACC)
         screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
         screen = cv2.resize(screen, IMG_RESIZING[:-1])
         cv2.imshow("video", screen)
@@ -114,19 +97,12 @@ def launch_dataset_feeding_v2() -> None:
         keys = key_check()
         inputs = keys_to_one_hot(keys)
 
-        try:
-            car_infos = f1_telemetry.get_car_infos(samples)
-            print(f"speed: {car_infos['speed']} "
-                  f"throttle: {car_infos['throttle']} "
-                  f"brake: {car_infos['brake']}")
-
-        except Exception as e:
-            print('Response error : {}'.format(e))
+        car_infos = read_physics()
 
         timestamp = time.time()
         image_filename = f"image_{counter}_{timestamp}.png"
 
-        line = f"{timestamp};{image_filename};{inputs}\n"
+        line = f"{timestamp};{image_filename};{inputs};{car_infos[0]};{car_infos[1]};{car_infos[2]}\n"
 
         # print("outputs = {} - keys = {}".format(output, one_hot_to_keys(output))) # Print inputs with equivalent keys
 
@@ -136,7 +112,7 @@ def launch_dataset_feeding_v2() -> None:
             training_file.write(line)
             wait_c = 0
         else:
-            print('wait...')
+            print('wait...' + str(wait_c))
             wait_c += 1
 
         if cv2.waitKey(25) & 0xFF == ord('w'):
@@ -223,61 +199,6 @@ def view_dataset_v2(file_name: str):
         img = cv2.imread(f'images/{image_name}')
 
         cv2.imshow('screen', img)
-
-        if cv2.waitKey(25) & 0xFF == ord('w'):
-            cv2.destroyAllWindows()
-            break
-
-
-def test() -> None:
-    listener = f1_telemetry.get_listener()
-    samples = {}
-    counter = 0
-    wait_c = 0
-
-    for i in list(range(5))[::-1]:
-        print(i + 1)
-        time.sleep(1)
-
-    while True:
-
-        packet = listener.get()
-
-        key = (
-            packet.header.packet_format,
-            packet.header.packet_version,
-            packet.header.packet_id,
-        )
-
-        packet_type = f1_telemetry.HEADER_FIELD_TO_PACKET_TYPE[key].__name__
-
-        samples[packet_type] = packet
-
-        screen = grab_screen(LEFT_2K, TOP_2K, WIDTH_2K, HEIGHT_2K)
-        screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
-        screen = cv2.resize(screen, IMG_RESIZING[:-1])
-        cv2.imshow("video", screen)
-
-        try:
-            car_infos = f1_telemetry.get_car_infos(samples)
-            print(f"speed: {car_infos['speed']} "
-                  f"throttle: {car_infos['throttle']} "
-                  f"brake: {car_infos['brake']}")
-
-        except Exception as e:
-            print('Response error : {}'.format(e))
-
-        timestamp = time.time()
-        image_filename = f"image_{counter}_{timestamp}.png"
-
-        # print("outputs = {} - keys = {}".format(output, one_hot_to_keys(output))) # Print inputs with equivalent keys
-
-        if counter == 0 or counter % 500 != 0 or wait_c == 50:
-            counter += 1
-            wait_c = 0
-        else:
-            print('wait...')
-            wait_c += 1
 
         if cv2.waitKey(25) & 0xFF == ord('w'):
             cv2.destroyAllWindows()
