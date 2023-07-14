@@ -1,5 +1,9 @@
 import pandas as pd
 import zipfile
+import numpy as np
+import os
+import ast
+from PIL import Image
 
 
 def get_data_and_zip(data_file_name: str):
@@ -19,3 +23,17 @@ def get_data_and_zip(data_file_name: str):
     finally:
         # Don't forget to close the file!
         zf.close()
+
+
+def load_images(df, img_dir):
+    image_list = []
+    for image_name in df['image_name']:
+        image_path = os.path.join(img_dir, image_name)
+        img = Image.open(image_path).convert('L')  # Convert to grayscale
+
+        image_list.append(np.array(img))
+    return np.array(image_list)
+
+
+def convert_string_to_list(input_str):
+    return ast.literal_eval(input_str)

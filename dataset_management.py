@@ -5,6 +5,7 @@ import cv2
 import time
 import pandas as pd
 import shutil
+from sklearn.utils import resample
 from PIL import Image
 from typing import List
 from random import shuffle
@@ -13,7 +14,7 @@ from grab_screen import grab_screen
 from get_inputs import keys_to_one_hot, key_check, one_hot_to_keys
 from variables import TOP_2K, LEFT_2K, WIDTH_2K, HEIGHT_2K, IMG_RESIZING, TOP_ACC, LEFT_ACC, WIDTH_ACC, HEIGHT_ACC
 from acc_mmap import read_physics
-from utils import get_data_and_zip
+from utils import get_data_and_zip, convert_string_to_list
 
 
 def charge_train_dataset(file_name) -> List[np.array]:
@@ -180,6 +181,34 @@ def balance_data(file_name):
     final_data = lefts + lefts_forwards + forwards + rights_forwards + rights + backwards_lefts + backwards + backwards_rights
     shuffle(final_data)
     return final_data, min_target
+
+
+def balance_data_v2(file_name):
+    train_data = pd.read_csv(file_name, sep=';')
+
+    class_counts = train_data['inputs'].value_counts()
+
+    print(f'Unbalanced dataset : \n{class_counts}')
+
+    min_class_size = class_counts.min()
+
+    balanced_df = pd.DataFrame()
+
+    for class_tuple, count in class_counts.items():
+        class_subset = train_data[train_data['inputs'] == class_tuple]
+        class_subset_downsampled = resample(class_subset,
+                                            replace=False,
+                                            n_samples=min_class_size,
+                                            random_state=42)
+        balanced_df = pd.concat([balanced_df, class_subset_downsampled])
+
+    balanced_class_counts = balanced_df['inputs'].value_counts()
+
+    print(f'Balanced dataset : \n{balanced_class_counts}')
+
+    balanced_df['inputs'] = balanced_df['inputs'].apply(convert_string_to_list)
+
+    return balanced_df, min_class_size
 
 
 def view_dataset(file_name: str):
