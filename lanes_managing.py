@@ -52,10 +52,6 @@ def draw_lanes_simple(img, lines, color=[0, 255, 255], thickness=3):
 def draw_lanes(img, lines, color=[0, 255, 255], thickness=3):
     # if this fails, go with some default line
     try:
-
-        # finds the maximum y value for a lane marker
-        # (since we cannot assume the horizon will always be at the same point.)
-
         ys = []
         for i in lines:
             for ii in i:
@@ -67,13 +63,12 @@ def draw_lanes(img, lines, color=[0, 255, 255], thickness=3):
 
         for idx, i in enumerate(lines):
             for xyxy in i:
-                # These four lines:
-                # modified from http://stackoverflow.com/questions/21565994/method-to-return-the-equation-of-a-straight-line-given-two-points
+                # from http://stackoverflow.com/questions/21565994/method-to-return-the-equation-of-a-straight-line-given-two-points
                 # Used to calculate the definition of a line, given two sets of coords.
                 x_coords = (xyxy[0], xyxy[2])
                 y_coords = (xyxy[1], xyxy[3])
                 A = vstack([x_coords, ones(len(x_coords))]).T
-                m, b = lstsq(A, y_coords)[0]
+                m, b = lstsq(A, y_coords, rcond=None)[0]
 
                 # Calculating our new, and improved, xs
                 x1 = (min_y - b) / m
@@ -145,8 +140,8 @@ def getLineCoordinatesFromParameters(image, line_parameters):
     """Deprecated"""
     slope = line_parameters[0]
     intercept = line_parameters[1]
-    y1 = image.shape[0]  # since line will always start from bottom of image
-    y2 = int(y1 * (3.4 / 5))  # some random point at 3/5
+    y1 = image.shape[0]
+    y2 = int(y1 * (3.4 / 5))
     x1 = int((y1 - intercept) / slope)
     x2 = int((y2 - intercept) / slope)
     return np.array([x1, y1, x2, y2])
@@ -154,8 +149,8 @@ def getLineCoordinatesFromParameters(image, line_parameters):
 
 def getSmoothLines(image, lines):
     """Deprecated"""
-    left_fit = []  # will hold m,c parameters for left side lines
-    right_fit = []  # will hold m,c parameters for right side lines
+    left_fit = []
+    right_fit = []
 
     for line in lines:
         x1, y1, x2, y2 = line.reshape(4)
@@ -170,7 +165,6 @@ def getSmoothLines(image, lines):
     left_fit_average = np.average(left_fit, axis=0)
     right_fit_average = np.average(right_fit, axis=0)
 
-    # now we have got m,c parameters for left and right line, we need to know x1,y1 x2,y2 parameters
     left_line = getLineCoordinatesFromParameters(image, left_fit_average)
     right_line = getLineCoordinatesFromParameters(image, right_fit_average)
     return np.array([left_line, right_line])

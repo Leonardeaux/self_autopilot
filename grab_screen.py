@@ -8,16 +8,6 @@ import win32gui, win32ui, win32con, win32api
 def grab_screen(left, top, width, height):
     hwin = win32gui.GetDesktopWindow()
 
-    # if region:
-    #     left, top, x2, y2 = region
-    #     width = x2 - left + 1
-    #     height = y2 - top + 1
-    # else:
-    #     width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-    #     height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
-    #     left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
-    #     top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
-
     hwindc = win32gui.GetWindowDC(hwin)
     srcdc = win32ui.CreateDCFromHandle(hwindc)
     memdc = srcdc.CreateCompatibleDC()

@@ -2,48 +2,46 @@ import numpy as np
 import cv2
 import image_processing as ip
 import variables
-
 from mss import mss
 from threading import Thread
+from grab_screen import grab_screen
 from driving_rules import not_really_an_ai
 
 
 sct = mss()
 
-# pytesseract.pytesseract.tesseract_cmd = os.environ['TESSERACT_PATH']
-
 
 class GameCapture:
     def __init__(self, vertices):
         self.vertices = vertices
-        self.stream = sct.grab(utils.BOX)
+        self.stream = sct.grab(variables.BOX)
         self.frame = np.array(self.stream)
         self.stopped = False
         self.frameGRAY = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-        self.frameEDGE = cv2.Canny(self.frameGRAY, threshold1=200, threshold2=300)
-        self.frameEDGE_BLUR = cv2.GaussianBlur(self.frameEDGE, (5, 5), 0)
-        self.frameROI_RAW = None
-        self.frameROI = None
-        # self.frameTESSERACT = None
-        self.frameLINES = None
-        self.frameORIGINAL = None
+        # self.frameGRAY = grab_screen(variables.LEFT, variables.TOP, variables.WIDTH, variables.HEIGHT)
+        # self.frameEDGE = cv2.Canny(self.frameGRAY, threshold1=200, threshold2=300)
+        # self.frameEDGE_BLUR = cv2.GaussianBlur(self.frameEDGE, (5, 5), 0)
+        # self.frameROI_RAW = None
+        # self.frameROI = None
+        # self.frameLINES = None
+        # self.frameORIGINAL = None
 
     def start(self):
         Thread(target=self.get, args=()).start()
         Thread(target=self.get_lines, args=()).start()
-        # Thread(target=self.get_timer, args=()).start()
 
         return self
 
     def get(self):
         while not self.stopped:
-            self.stream = sct.grab(utils.BOX)
+            self.stream = sct.grab(variables.BOX)
             self.frame = np.array(self.stream)
             self.frameGRAY = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-            self.frameEDGE = cv2.Canny(self.frameGRAY, threshold1=200, threshold2=300)
-            self.frameEDGE_BLUR = cv2.GaussianBlur(self.frameEDGE, (5, 5), 0)
-            self.frameROI = ip.roi(self.frameEDGE, self.vertices)
-            self.frameROI_RAW = ip.roi(self.frame, self.vertices)
+            # self.frameGRAY = grab_screen(variables.LEFT, variables.TOP, variables.WIDTH, variables.HEIGHT)
+            # self.frameEDGE = cv2.Canny(self.frameGRAY, threshold1=200, threshold2=300)
+            # self.frameEDGE_BLUR = cv2.GaussianBlur(self.frameEDGE, (5, 5), 0)
+            # self.frameROI = ip.roi(self.frameEDGE, self.vertices)
+            # self.frameROI_RAW = ip.roi(self.frame, self.vertices)
 
     def get_timer(self):
         """Not used anymore"""
@@ -60,15 +58,16 @@ class GameCapture:
 
     def get_lines(self):
         while not self.stopped:
-            (self.frameLINES, self.frameORIGINAL, m1, m2) = ip.process_img_avg_lines(self.frame, self.vertices)
-            not_really_an_ai(m1, m2)
+            pass
+            # (self.frameLINES, self.frameORIGINAL, m1, m2) = ip.process_img_avg_lines(self.frame, self.vertices)
+            # not_really_an_ai(m1, m2)
 
     def stop(self):
         self.stopped = True
 
 
 def launch_capture():
-    video_getter = GameCapture(utils.VERTICES_FIRST_PERSON_SUPERCAR).start()
+    video_getter = GameCapture(variables.VERTICES_FIRST_PERSON_SUPERCAR).start()
 
     while True:
         if video_getter.stopped or cv2.waitKey(1) == ord("w"):
@@ -77,9 +76,10 @@ def launch_capture():
             break
 
         try:
-            cv2.imshow("Video_lines", video_getter.frameLINES)
-            cv2.imshow("Video_edge", video_getter.frameEDGE)
-            cv2.imshow("Video_original", video_getter.frameORIGINAL)
+            cv2.imshow("video", video_getter.frameGRAY)
+            # cv2.imshow("Video_lines", video_getter.frameLINES)
+            # cv2.imshow("Video_edge", video_getter.frameEDGE)
+            # cv2.imshow("Video_original", video_getter.frameORIGINAL)
         except Exception as e:
             print('showing images error : {}'.format(e))
             pass
