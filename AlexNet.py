@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, BatchNormalization, Input, concatenate
 from keras.optimizers import SGD

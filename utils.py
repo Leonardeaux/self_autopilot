@@ -37,3 +37,13 @@ def load_images(df, img_dir):
 
 def convert_string_to_list(input_str):
     return ast.literal_eval(input_str)
+
+
+def param_to_message(**kwargs: str):
+    json_message = "{"
+    for key, value in kwargs.items():
+        json_message += f'"{key}": {value},'
+
+    json_message = json_message[:-1]
+    json_message += '}'
+    return json_message

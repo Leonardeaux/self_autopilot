@@ -12,6 +12,12 @@ LEFT_2K = 0
 WIDTH_2K = 2560
 HEIGHT_2K = 1440 - TOP_2K
 
+# Taille écran PC portable
+TOP_POR = 33
+LEFT_POR = 0
+WIDTH_POR = 1360
+HEIGHT_POR = 768
+
 # Taille écran Assetto Corsa Competizione
 TOP_ACC = 175
 LEFT_ACC = 0
@@ -24,7 +30,6 @@ TOP_CHR = int(HEIGHT - (HEIGHT * 0.08))
 LEFT_CHR = int(WIDTH - (WIDTH * 0.57))
 BOTTOM_CHR = int(HEIGHT - (HEIGHT * 0.02))
 RIGHT_CHR = int(WIDTH - (WIDTH * 0.44))
-
 
 # Resize des images pour les entrainements
 IMG_RESIZING = (160, 120, 1)
@@ -53,4 +58,12 @@ VERTICES_THIRD_PERSON = np.array([[0, HEIGHT * 0.8],
                                   [WIDTH, HEIGHT * 0.57],
                                   [WIDTH, HEIGHT * 0.8]], dtype=np.int32)
 
+VERTICES_FIRST_PERSON_ACC_POR = np.array([[0, HEIGHT_POR * 0.72],
+                                          [0, HEIGHT_POR * 0.6],
+                                          [WIDTH_POR / 3, HEIGHT_POR * 0.38],
+                                          [WIDTH_POR * 0.6666, HEIGHT_POR * 0.38],
+                                          [WIDTH_POR, HEIGHT_POR * 0.6],
+                                          [WIDTH_POR, HEIGHT_POR * 0.72]], dtype=np.int32)
+
 BOX = {'top': TOP, 'left': LEFT, 'width': WIDTH, 'height': HEIGHT}
+BOX_POR = {'top': TOP_POR, 'left': LEFT_POR, 'width': WIDTH_POR, 'height': HEIGHT_POR}

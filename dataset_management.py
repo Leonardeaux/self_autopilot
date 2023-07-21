@@ -5,6 +5,7 @@ import cv2
 import time
 import pandas as pd
 import shutil
+import matplotlib.pyplot as plt
 from sklearn.utils import resample
 from PIL import Image
 from typing import List
@@ -235,3 +236,36 @@ def view_dataset_v2(file_name: str):
         if cv2.waitKey(25) & 0xFF == ord('w'):
             cv2.destroyAllWindows()
             break
+
+
+def draw_graph_on_dataset(filename):
+    _, file_extension = os.path.splitext(filename)
+    if file_extension == '.npy':
+        training_df = charge_train_dataset(filename)
+        training_df = pd.DataFrame(training_df)
+    else:
+        training_df = pd.read_csv(filename, sep=';')
+
+    class_counts = training_df[1].value_counts()
+    print(class_counts)
+
+    # [(Q), (Z, Q), (Z), (Z, D), (D), (S, Q), (S), (S, D)] boolean values.
+    alias_dict = {"[1, 0, 0, 0, 0, 0, 0, 0]": "(Q)",
+                  "[0, 1, 0, 0, 0, 0, 0, 0]": "(Z, Q)",
+                  "[0, 0, 1, 0, 0, 0, 0, 0]": "(Z)",
+                  "[0, 0, 0, 1, 0, 0, 0, 0]": "(Z, D)",
+                  "[0, 0, 0, 0, 1, 0, 0, 0]": "(D)",
+                  "[0, 0, 0, 0, 0, 1, 0, 0]": "(S, Q)",
+                  "[0, 0, 0, 0, 0, 0, 1, 0]": "(S)",
+                  "[0, 0, 0, 0, 0, 0, 0, 1]": "(S, D)"}
+    x_labels = ["(Z)", "(Z, D)", "(Z, Q)", "(S)", "(D)", "(S, D)", "(S, Q)", "(Q)"]
+
+    plt.figure(figsize=(10, 5))
+    class_counts.plot(kind='bar')
+    plt.title('Distribution des valeurs uniques dans inputs')
+    plt.xlabel('Valeurs uniques')
+    plt.ylabel('Compte')
+
+    plt.xticks(range(len(x_labels)), x_labels)
+
+    plt.show()
