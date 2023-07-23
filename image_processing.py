@@ -32,7 +32,9 @@ def process_img_avg_lines(image, vertices):
     processed_img, original_image = process_img(image, vertices)
 
     # lines = cv2.HoughLinesP(processed_img, 1, np.pi / 180, 180, 120, 20)
-    lines = cv2.HoughLinesP(processed_img, 1, np.pi / 180, 180, minLineLength=65, maxLineGap=20)
+    lines = cv2.HoughLinesP(
+        processed_img, 1, np.pi / 180, 180, minLineLength=65, maxLineGap=20
+    )
     m1 = 0
     m2 = 0
     try:
@@ -63,10 +65,10 @@ def process_image_kmeans(image, vertices):
 
     try:
         nlines = np.array([l[0] for l in lines])
-        kmeans = KMeans(n_clusters=2, random_state=0, n_init='auto').fit(nlines)
+        kmeans = KMeans(n_clusters=2, random_state=0, n_init="auto").fit(nlines)
         lm.draw_lanes_simple(original_image, kmeans.cluster_centers_)
     except (ValueError, TypeError) as e:
-        print('KMeans error: {}'.format(e))
+        print("KMeans error: {}".format(e))
 
     return processed_img, original_image
 

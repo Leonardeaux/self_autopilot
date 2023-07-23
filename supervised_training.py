@@ -8,47 +8,63 @@ from utils import load_images
 from dataset_management import balance_data, balance_data_v2, charge_train_dataset
 from typing import Tuple
 from AlexNet import AlexNet_model, AlexNet_model_with_additional_data
-from ast import literal_eval
+from tensorflow.python.ops import string_ops, parsing_ops
+from utils import convert_string_to_list
 
 
-def AlexNet_training(input_shape: Tuple[int, int, int],
-                     n_class: int, epochs: int = 10,
-                     learning_rate: float = 0.001,
-                     validation_split_value: float = 0.2) -> None:
-    model_name = f'AlexNet_model_epochs_{epochs}_lr_{learning_rate}'
+def AlexNet_training(
+    input_shape: Tuple[int, int, int],
+    n_class: int,
+    epochs: int = 10,
+    learning_rate: float = 0.001,
+    validation_split_value: float = 0.2,
+) -> None:
+    model_name = f"AlexNet_model_epochs_{epochs}_lr_{learning_rate}"
 
-    final_data, max_nb_target = balance_data('training_data.npy')
+    final_data, max_nb_target = balance_data("training_data.npy")
 
-    model = AlexNet_model(input_shape=input_shape, n_class=n_class, learning_rate=learning_rate)
+    model = AlexNet_model(
+        input_shape=input_shape, n_class=n_class, learning_rate=learning_rate
+    )
 
     nb_test_values = int(max_nb_target * validation_split_value)
 
     train = final_data[:-nb_test_values]
     test = final_data[-nb_test_values:]
 
-    train_x = np.array([i[0] for i in train]).reshape(-1, input_shape[0], input_shape[1], input_shape[2])
+    train_x = np.array([i[0] for i in train]).reshape(
+        -1, input_shape[0], input_shape[1], input_shape[2]
+    )
     train_y = np.array([i[1] for i in train])
 
-    test_x = np.array([i[0] for i in test]).reshape(-1, input_shape[0], input_shape[1], input_shape[2])
+    test_x = np.array([i[0] for i in test]).reshape(
+        -1, input_shape[0], input_shape[1], input_shape[2]
+    )
     test_y = np.array([i[1] for i in test])
 
-    model.fit(train_x, train_y,
-              epochs=epochs,
-              validation_data=(test_x, test_y),
-              callbacks=[
-                  tf.keras.callbacks.TensorBoard("tensorboard_logs/alexnet/" + model_name)
-              ])
+    model.fit(
+        train_x,
+        train_y,
+        epochs=epochs,
+        validation_data=(test_x, test_y),
+        callbacks=[
+            tf.keras.callbacks.TensorBoard("tensorboard_logs/alexnet/" + model_name)
+        ],
+    )
 
     model.save("models/" + model_name)
 
 
-def AlexNet_training_with_class_weights(input_shape: Tuple[int, int, int],
-                                        n_class: int, epochs: int = 10,
-                                        learning_rate: float = 0.001,
-                                        validation_split_value: float = 0.2) -> None:
-    model_name = f'AlexNet_model_with_class_weights_epochs_{epochs}_lr_{learning_rate}'
+def AlexNet_training_with_class_weights(
+    input_shape: Tuple[int, int, int],
+    n_class: int,
+    epochs: int = 10,
+    learning_rate: float = 0.001,
+    validation_split_value: float = 0.2,
+) -> None:
+    model_name = f"AlexNet_model_with_class_weights_epochs_{epochs}_lr_{learning_rate}"
 
-    final_data = charge_train_dataset('training_data.npy')
+    final_data = charge_train_dataset("training_data.npy")
 
     df = pd.DataFrame(final_data)
 
@@ -56,56 +72,71 @@ def AlexNet_training_with_class_weights(input_shape: Tuple[int, int, int],
 
     min_target = np.min(list(nb_targets.values()))
 
-    model = AlexNet_model(input_shape=input_shape,
-                          n_class=n_class,
-                          learning_rate=learning_rate)
+    model = AlexNet_model(
+        input_shape=input_shape, n_class=n_class, learning_rate=learning_rate
+    )
 
     nb_test_values = int(min_target * validation_split_value)
 
     train = final_data[:-nb_test_values]
     test = final_data[-nb_test_values:]
 
-    train_x = np.array([i[0] for i in train]).reshape(-1, input_shape[0], input_shape[1], input_shape[2])
+    train_x = np.array([i[0] for i in train]).reshape(
+        -1, input_shape[0], input_shape[1], input_shape[2]
+    )
     train_y = np.array([i[1] for i in train])
 
-    test_x = np.array([i[0] for i in test]).reshape(-1, input_shape[0], input_shape[1], input_shape[2])
+    test_x = np.array([i[0] for i in test]).reshape(
+        -1, input_shape[0], input_shape[1], input_shape[2]
+    )
     test_y = np.array([i[1] for i in test])
 
     # Convert one-hot encoded targets to integer labels
     y_integers = np.argmax(train_y, axis=1)
 
     # Calculate class weights
-    class_weights = compute_class_weight(class_weight='balanced',
-                                         classes=np.unique(y_integers),
-                                         y=y_integers)
+    class_weights = compute_class_weight(
+        class_weight="balanced", classes=np.unique(y_integers), y=y_integers
+    )
     class_weights = dict(enumerate(class_weights))
 
     print(class_weights)
 
-    model.fit(train_x, train_y,
-              epochs=epochs,
-              validation_data=(test_x, test_y),
-              class_weight=class_weights,
-              callbacks=[
-                  tf.keras.callbacks.TensorBoard("tensorboard_logs/alexnet/" + model_name)
-              ])
+    model.fit(
+        train_x,
+        train_y,
+        epochs=epochs,
+        validation_data=(test_x, test_y),
+        class_weight=class_weights,
+        callbacks=[
+            tf.keras.callbacks.TensorBoard("tensorboard_logs/alexnet/" + model_name)
+        ],
+    )
 
     model.save("models/" + model_name)
 
 
-def AlexNet_with_additional_data(input_shape: Tuple[int, int, int],
-                                 additional_info_dim: int,
-                                 n_class: int,
-                                 epochs: int = 10,
-                                 learning_rate: float = 0.001,
-                                 validation_split_value: float = 0.2) -> None:
+def AlexNet_with_additional_data(
+    input_shape: Tuple[int, int, int],
+    additional_info_dim: int,
+    n_class: int,
+    epochs: int = 10,
+    learning_rate: float = 0.001,
+    validation_split_value: float = 0.2,
+) -> None:
     file_name = "training_data.csv"
 
-    model_name = f'AlexNet_model_with_additional_data_epochs_{epochs}_lr_{learning_rate}'
+    model_name = (
+        f"AlexNet_model_with_additional_data_epochs_{epochs}_lr_{learning_rate}"
+    )
 
-    final_data, max_nb_target = balance_data_v2(file_name)
+    final_data = pd.read_csv(file_name, sep=";")
 
-    df_train, df_test = train_test_split(final_data, test_size=validation_split_value, random_state=42)
+    final_data["inputs"] = final_data["inputs"].apply(convert_string_to_list)
+
+    df_train, df_test = train_test_split(
+        final_data, test_size=validation_split_value, random_state=42
+    )
 
     train_images = load_images(df_train, "images")
     train_images = np.expand_dims(train_images, axis=-1)
@@ -128,22 +159,41 @@ def AlexNet_with_additional_data(input_shape: Tuple[int, int, int],
     test_y = np.array(test_y.tolist())
     test_y = tf.convert_to_tensor(test_y)
 
-    # print(train_images.shape)
-    # print(len(train_speeds))
-    # print(len(train_throttles))
-    # print(len(train_brakes))
-    # print(len(train_y))
+    # Convertir les listes encodées en one-hot en entiers
+    tensor_ints = tf.argmax(train_y, axis=1)
+    tensor_ints = (
+        tensor_ints.numpy()
+    )  # Convertir en numpy array pour être utilisé avec sklearn
 
-    model = AlexNet_model_with_additional_data(input_shape=input_shape,
-                                               additional_info_dim=additional_info_dim,
-                                               n_class=n_class,
-                                               learning_rate=learning_rate)
+    # Utiliser compute_class_weight
+    classes = np.unique(tensor_ints)
 
-    model.fit([train_images, train_speeds, train_throttles, train_brakes], train_y,
-              epochs=epochs,
-              validation_data=([test_images, test_speeds, test_throttles, test_brakes], test_y),
-              callbacks=[
-                  tf.keras.callbacks.TensorBoard("tensorboard_logs/alexnet/" + model_name)
-              ])
+    # Calculate class weights
+    class_weights = compute_class_weight(
+        class_weight="balanced", classes=classes, y=tensor_ints
+    )
+    class_weights = dict(enumerate(class_weights))
+
+    model = AlexNet_model_with_additional_data(
+        input_shape=input_shape,
+        additional_info_dim=additional_info_dim,
+        n_class=n_class,
+        learning_rate=learning_rate,
+    )
+
+    model.fit(
+        [train_images, train_speeds, train_throttles, train_brakes],
+        train_y,
+        epochs=epochs,
+        validation_data=(
+            [test_images, test_speeds, test_throttles, test_brakes],
+            test_y,
+        ),
+        class_weight=class_weights,
+        batch_size=500,
+        callbacks=[
+            tf.keras.callbacks.TensorBoard("tensorboard_logs/alexnet/" + model_name)
+        ],
+    )
 
     model.save("models/" + model_name)

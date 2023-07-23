@@ -34,18 +34,24 @@ def average_lane(lane_data):
 def draw_lanes_simple(img, lines, color=[0, 255, 255], thickness=3):
     try:
         for coords in lines:
-            coords = np.array(coords, dtype='uint32')
-            cv2.line(img,
-                     (coords[0], coords[1]),
-                     (coords[2], coords[3]),
-                     color=color, thickness=thickness)
-            cv2.line(img,
-                     (coords[0] * 5, coords[1] * 5),
-                     (coords[2] * 5, coords[3] * 5),
-                     color=[0, 255, 0], thickness=thickness)
+            coords = np.array(coords, dtype="uint32")
+            cv2.line(
+                img,
+                (coords[0], coords[1]),
+                (coords[2], coords[3]),
+                color=color,
+                thickness=thickness,
+            )
+            cv2.line(
+                img,
+                (coords[0] * 5, coords[1] * 5),
+                (coords[2] * 5, coords[3] * 5),
+                color=[0, 255, 0],
+                thickness=thickness,
+            )
 
     except Exception as e:
-        print('draw lines error : {}'.format(e))
+        print("draw lines error : {}".format(e))
 
 
 def draw_lanes(img, lines, color=[0, 255, 255], thickness=3):
@@ -91,11 +97,13 @@ def draw_lanes(img, lines, color=[0, 255, 255], thickness=3):
                 found_copy = False
 
                 for other_ms in final_lanes_copy:
-
                     if not found_copy:
                         if abs(other_ms * 1.2) > abs(m) > abs(other_ms * 0.8):
-                            if abs(final_lanes_copy[other_ms][0][1] * 1.2) > abs(b) > abs(
-                                    final_lanes_copy[other_ms][0][1] * 0.8):
+                            if (
+                                abs(final_lanes_copy[other_ms][0][1] * 1.2)
+                                > abs(b)
+                                > abs(final_lanes_copy[other_ms][0][1] * 0.8)
+                            ):
                                 final_lanes[other_ms].append([m, b, line])
                                 found_copy = True
                                 break
@@ -115,14 +123,21 @@ def draw_lanes(img, lines, color=[0, 255, 255], thickness=3):
         l1_x1, l1_y1, l1_x2, l1_y2 = average_lane(final_lanes[lane1_id])
         l2_x1, l2_y1, l2_x2, l2_y2 = average_lane(final_lanes[lane2_id])
 
-        return [l1_x1, l1_y1, l1_x2, l1_y2], [l2_x1, l2_y1, l2_x2, l2_y2], lane1_id, lane2_id
+        return (
+            [l1_x1, l1_y1, l1_x2, l1_y2],
+            [l2_x1, l2_y1, l2_x2, l2_y2],
+            lane1_id,
+            lane2_id,
+        )
     except Exception as e:
         print(str(e))
 
 
 def getLines(image):
     """Deprecated"""
-    lines = cv2.HoughLinesP(image, 0.3, np.pi / 180, 100, np.array([]), minLineLength=70, maxLineGap=20)
+    lines = cv2.HoughLinesP(
+        image, 0.3, np.pi / 180, 100, np.array([]), minLineLength=70, maxLineGap=20
+    )
     return lines
 
 

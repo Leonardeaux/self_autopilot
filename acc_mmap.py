@@ -80,7 +80,6 @@ class SPageFileGraphic(Structure):
         ("tyreCompound", c_wchar * 33),
         ("replayTimeMultiplier", c_float),
         ("normalizedCarPosition", c_float),
-
         ("activeCars", c_int),
         ("carCoordinates", c_float * 60 * 3),
         ("carID", c_int * 60),
@@ -90,15 +89,11 @@ class SPageFileGraphic(Structure):
         ("penalty", c_int),
         ("idealLineOn", c_int),
         ("isInPitLane", c_int),
-
         ("surfaceGrip", c_float),
         ("mandatoryPitDone", c_int),
-
         ("windSpeed", c_float),
         ("windDirection", c_float),
-
         ("isSetupMenuVisible", c_int),
-
         ("mainDisplayIndex", c_int),
         ("secondaryDisplayIndex", c_int),
         ("TC", c_int),
@@ -171,45 +166,33 @@ class SPageFilePhysics(Structure):
         ("localAngularVel", c_float * 3),
         ("finalFF", c_float),
         ("performanceMeter", c_float),
-
         ("engineBrake", c_int),
         ("ersRecoveryLevel", c_int),
         ("ersPowerLevel", c_int),
         ("ersHeatCharging", c_int),
         ("ersIsCharging", c_int),
         ("kersCurrentKJ", c_float),
-
         ("drsAvailable", c_int),
         ("drsEnabled", c_int),
-
         ("brakeTemp", c_float * 4),
         ("clutch", c_float),
-
         ("tyreTempI", c_float * 4),
         ("tyreTempM", c_float * 4),
         ("tyreTempO", c_float * 4),
-
         ("isAIControlled", c_int),
-
         ("tyreContactPoint", c_float * 4 * 3),
         ("tyreContactNormal", c_float * 4 * 3),
         ("tyreContactHeading", c_float * 4 * 3),
-
         ("brakeBias", c_float),
-
         ("localVelocity", c_float * 3),
-
         ("P2PActivations", c_int),
         ("P2PStatus", c_int),
-
         ("currentMaxRpm", c_int),
-
         ("mz", c_float * 4),
         ("fx", c_float * 4),
         ("fy", c_float * 4),
         ("slipRatio", c_float * 4),
         ("slipAngle", c_float * 4),
-
         ("tcinAction", c_int),
         ("absInAction", c_int),
         ("suspensionDamage", c_float * 4),
@@ -297,24 +280,24 @@ class SPageFilePhysics(Structure):
 
 
 def read_physics():
-    buf = mmap.mmap(-1, sizeof(SPageFilePhysics), u"Local\\acpmf_physics")
+    buf = mmap.mmap(-1, sizeof(SPageFilePhysics), "Local\\acpmf_physics")
     data = SPageFilePhysics.from_buffer(buf)
     return data.toArray()
 
 
 def read_physics_to_dict():
-    buf = mmap.mmap(-1, sizeof(SPageFilePhysics), u"Local\\acpmf_physics")
+    buf = mmap.mmap(-1, sizeof(SPageFilePhysics), "Local\\acpmf_physics")
     data = SPageFilePhysics.from_buffer(buf)
     return data.toDict()
 
 
 def read_static():
-    buf = mmap.mmap(-1, sizeof(SPageFileStatic), u"Local\\acpmf_static")
+    buf = mmap.mmap(-1, sizeof(SPageFileStatic), "Local\\acpmf_static")
     data = SPageFileStatic.from_buffer(buf)
     return data.toDict()
 
 
 def read_graphics():
-    buf = mmap.mmap(-1, sizeof(SPageFileGraphic), u"Local\\acpmf_graphics")
+    buf = mmap.mmap(-1, sizeof(SPageFileGraphic), "Local\\acpmf_graphics")
     data = SPageFileGraphic.from_buffer(buf)
     return data.toDict()

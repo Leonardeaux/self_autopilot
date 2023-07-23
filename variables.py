@@ -10,7 +10,7 @@ HEIGHT = 768  # Hauteur du jeu = 768
 TOP_2K = 0
 LEFT_2K = 0
 WIDTH_2K = 2560
-HEIGHT_2K = 1440 - TOP_2K
+HEIGHT_2K = 1440
 
 # Taille écran PC portable
 TOP_POR = 33
@@ -37,33 +37,54 @@ IMG_RESIZING = (160, 120, 1)
 # Nombre de classe en sortie
 N_CLASS = 8
 
-VERTICES_FIRST_PERSON_F1 = np.array([[0, HEIGHT * 0.85],
-                                     [0, HEIGHT * 0.6666],
-                                     [WIDTH / 3, HEIGHT * 0.4],
-                                     [WIDTH * 0.6666, HEIGHT * 0.4],
-                                     [WIDTH, HEIGHT * 0.6666],
-                                     [WIDTH, HEIGHT * 0.85]], dtype=np.int32)
+VERTICES_FIRST_PERSON_F1 = np.array(
+    [
+        [0, HEIGHT * 0.85],
+        [0, HEIGHT * 0.6666],
+        [WIDTH / 3, HEIGHT * 0.4],
+        [WIDTH * 0.6666, HEIGHT * 0.4],
+        [WIDTH, HEIGHT * 0.6666],
+        [WIDTH, HEIGHT * 0.85],
+    ],
+    dtype=np.int32,
+)
 
-VERTICES_FIRST_PERSON_SUPERCAR = np.array([[0, HEIGHT * 0.82],
-                                           [0, HEIGHT * 0.5],
-                                           [WIDTH / 3, HEIGHT * 0.45],
-                                           [WIDTH * 0.6666, HEIGHT * 0.45],
-                                           [WIDTH, HEIGHT * 0.5],
-                                           [WIDTH, HEIGHT * 0.82]], dtype=np.int32)
+VERTICES_FIRST_PERSON_SUPERCAR = np.array(
+    [
+        [0, HEIGHT * 0.82],
+        [0, HEIGHT * 0.5],
+        [WIDTH / 3, HEIGHT * 0.45],
+        [WIDTH * 0.6666, HEIGHT * 0.45],
+        [WIDTH, HEIGHT * 0.5],
+        [WIDTH, HEIGHT * 0.82],
+    ],
+    dtype=np.int32,
+)
 
-VERTICES_THIRD_PERSON = np.array([[0, HEIGHT * 0.8],
-                                  [0, HEIGHT * 0.57],
-                                  [WIDTH * 0.3333, HEIGHT * 0.45],
-                                  [WIDTH * 0.6666, HEIGHT * 0.45],
-                                  [WIDTH, HEIGHT * 0.57],
-                                  [WIDTH, HEIGHT * 0.8]], dtype=np.int32)
+VERTICES_THIRD_PERSON = np.array(
+    [
+        [0, HEIGHT * 0.8],
+        [0, HEIGHT * 0.57],
+        [WIDTH * 0.3333, HEIGHT * 0.45],
+        [WIDTH * 0.6666, HEIGHT * 0.45],
+        [WIDTH, HEIGHT * 0.57],
+        [WIDTH, HEIGHT * 0.8],
+    ],
+    dtype=np.int32,
+)
 
-VERTICES_FIRST_PERSON_ACC_POR = np.array([[0, HEIGHT_POR * 0.72],
-                                          [0, HEIGHT_POR * 0.6],
-                                          [WIDTH_POR / 3, HEIGHT_POR * 0.38],
-                                          [WIDTH_POR * 0.6666, HEIGHT_POR * 0.38],
-                                          [WIDTH_POR, HEIGHT_POR * 0.6],
-                                          [WIDTH_POR, HEIGHT_POR * 0.72]], dtype=np.int32)
+VERTICES_FIRST_PERSON_ACC_POR = np.array(
+    [
+        [0, HEIGHT_POR * 0.72],
+        [0, HEIGHT_POR * 0.6],
+        [WIDTH_POR / 3, HEIGHT_POR * 0.38],
+        [WIDTH_POR * 0.6666, HEIGHT_POR * 0.38],
+        [WIDTH_POR, HEIGHT_POR * 0.6],
+        [WIDTH_POR, HEIGHT_POR * 0.72],
+    ],
+    dtype=np.int32,
+)
 
-BOX = {'top': TOP, 'left': LEFT, 'width': WIDTH, 'height': HEIGHT}
-BOX_POR = {'top': TOP_POR, 'left': LEFT_POR, 'width': WIDTH_POR, 'height': HEIGHT_POR}
+BOX = {"top": TOP, "left": LEFT, "width": WIDTH, "height": HEIGHT}
+BOX_POR = {"top": TOP_POR, "left": LEFT_POR, "width": WIDTH_POR, "height": HEIGHT_POR}
+BOX_2K = {"top": TOP_2K, "left": LEFT_2K, "width": WIDTH_2K, "height": HEIGHT_2K}

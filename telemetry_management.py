@@ -13,7 +13,7 @@ def create_telemetry_file(line_nb):
 
             if physics["speedKmh"] == 0:
                 continue
-            json.dump({"index": {"_index": "telemetrie", "_id": str(i+1)}}, file)
-            file.write('\n')
+            json.dump({"index": {"_index": "telemetrie", "_id": str(i + 1)}}, file)
+            file.write("\n")
             json.dump(physics, file)
-            file.write('\n')
+            file.write("\n")

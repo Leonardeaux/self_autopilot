@@ -21,19 +21,19 @@ def keys_to_one_hot(keys):
     """
     one_hot = [0, 0, 0, 0, 0, 0, 0, 0]
 
-    if 'Z' in keys and 'Q' in keys:
+    if "Z" in keys and "Q" in keys:
         one_hot[1] = 1
-    elif 'Z' in keys and 'D' in keys:
+    elif "Z" in keys and "D" in keys:
         one_hot[3] = 1
-    elif 'S' in keys and 'Q' in keys:
+    elif "S" in keys and "Q" in keys:
         one_hot[5] = 1
-    elif 'S' in keys and 'D' in keys:
+    elif "S" in keys and "D" in keys:
         one_hot[7] = 1
-    elif 'Q' in keys:
+    elif "Q" in keys:
         one_hot[0] = 1
-    elif 'D' in keys:
+    elif "D" in keys:
         one_hot[4] = 1
-    elif 'S' in keys:
+    elif "S" in keys:
         one_hot[6] = 1
     else:
         one_hot[2] = 1
@@ -43,20 +43,20 @@ def keys_to_one_hot(keys):
 
 def one_hot_to_keys(one_hot):
     if one_hot[1] == 1:
-        keys = ['Z', 'Q']
+        keys = ["Z", "Q"]
     elif one_hot[3] == 1:
-        keys = ['Z', 'D']
+        keys = ["Z", "D"]
     elif one_hot[5] == 1:
-        keys = ['S', 'Q']
+        keys = ["S", "Q"]
     elif one_hot[7] == 1:
-        keys = ['S', 'D']
+        keys = ["S", "D"]
     elif one_hot[0] == 1:
-        keys = ['Q']
+        keys = ["Q"]
     elif one_hot[4] == 1:
-        keys = ['D']
+        keys = ["D"]
     elif one_hot[6] == 1:
-        keys = ['S']
+        keys = ["S"]
     else:
-        keys = ['Z']
+        keys = ["Z"]
 
     return keys

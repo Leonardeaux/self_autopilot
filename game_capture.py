@@ -56,7 +56,9 @@ class GameCapture:
     def get_lines(self):
         while not self.stopped:
             pass
-            (self.frameLINES, self.frameORIGINAL, m1, m2) = ip.process_img_avg_lines(self.frame, self.vertices)
+            (self.frameLINES, self.frameORIGINAL, m1, m2) = ip.process_img_avg_lines(
+                self.frame, self.vertices
+            )
             not_really_an_ai(m1, m2)
 
     def stop(self):
@@ -77,5 +79,5 @@ def launch_capture():
             cv2.imshow("Video_roi", video_getter.frameROI_DBG)
             # cv2.imshow("Video_original", video_getter.frameORIGINAL)
         except Exception as e:
-            print('showing images error : {}'.format(e))
+            print("showing images error : {}".format(e))
             pass
